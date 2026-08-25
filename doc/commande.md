@@ -64,3 +64,8 @@ php artisan make:test StockTriggerTest
 php artisan key:generate --env=testing
 
 php artisan test --filter=StockTriggerTest
+
+
+php artisan make:controller Api/CategorieMatiereController
+php artisan make:controller Api/UniteMesureController
+php artisan make:controller Api/TypeMouvementController

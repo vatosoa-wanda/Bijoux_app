@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+@theme {
+  --color-rose-poudre: #E8B4BC;
+  --color-terracotta: #D77A61;
+  --color-creme: #FFF1E6;
+  --color-vert-sauge: #9CAF88;
+  --color-brun-doux: #5A3E36;
+
+  --font-sans: "Poppins", sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-creme);
+  color: var(--color-brun-doux);
+}
