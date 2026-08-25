@@ -295,18 +295,18 @@ npx tailwindcss init -p
 - [x] Créer un `.env.example` propre, initialiser le README
 
 **Migrations & modèles :**
-- [ ] Traduire le schéma SQL fourni en migrations Laravel (tables : `unite_mesure`, `categorie_matiere`, `matiere_premiere`, `type_mouvement`, `mouvement_stock`, `type_bijou`, `collection`, `bijou`, `composition_bijou`, `parametre`)
+- [x] Traduire le schéma SQL fourni en migrations Laravel (tables : `unite_mesure`, `categorie_matiere`, `matiere_premiere`, `type_mouvement`, `mouvement_stock`, `type_bijou`, `collection`, `bijou`, `composition_bijou`, `parametre`)
 - [x] Créer les `ENUM` PostgreSQL via `DB::statement()` dans une migration dédiée (`sens_mouvement`, `taille_bijou`, `complexite_bijou`, `statut_produit`)
 - [x] Créer les modèles Eloquent + relations (`Bijou::compositions()`, `MatierePremiere::mouvements()`, etc.)
 - [x] Migration séparée pour les triggers/fonctions/vues de la **Fonctionnalité 1** (via `DB::unprepared()`)
 - [xsq] Seeders : unités, catégories, quelques matières premières, types de mouvement, paramètres (taux horaire, charges)
 
 **Backend Fonctionnalité 1 :**
-- [ ] `MatierePremiereController` (CRUD) + `FormRequest` de validation
-- [ ] `MouvementStockController@store` (capture des exceptions PostgreSQL)
-- [ ] Route `GET /api/matieres/alertes`
+- [x] `MatierePremiereController` (CRUD) + `FormRequest` de validation
+- [x] `MouvementStockController@store` (capture des exceptions PostgreSQL)
+- [x] Route `GET /api/matieres/alertes`
 - [ ] Tester tout avec Postman
-- [ ] 2-3 tests PHPUnit (Feature) sur le trigger de stock
+- [x] 2-3 tests PHPUnit (Feature) sur le trigger de stock
 
 ### Après-midi (env. 4h) — Frontend layout + Fonctionnalité 1
 

@@ -37,3 +37,30 @@ php artisan make:seeder MatierePremiereSeeder
 
 # Execution finale
 php artisan migrate:fresh --seed
+
+# Controllers
+php artisan make:controller Api/MatierePremiereController --api
+php artisan make:controller Api/MouvementStockController
+php artisan make:request StoreMatierePremiereRequest
+php artisan make:request UpdateMatierePremiereRequest
+php artisan make:request StoreMouvementStockRequest
+php artisan make:resource MatierePremiereResource
+php artisan make:resource MouvementStockResource
+
+# Endpoint dispo
+GET    /api/matieres
+POST   /api/matieres
+GET    /api/matieres/{id}
+PUT    /api/matieres/{id}
+DELETE /api/matieres/{id}
+GET    /api/matieres/alertes
+GET    /api/mouvements
+POST   /api/mouvements
+
+
+# Tests PHPUnit (Feature)
+php artisan make:test StockTriggerTest
+
+php artisan key:generate --env=testing
+
+php artisan test --filter=StockTriggerTest
