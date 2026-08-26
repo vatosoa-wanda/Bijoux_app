@@ -18,4 +18,9 @@ class ControleQualite extends Model
     {
         return $this->hasMany(DefautConstate::class, 'id_controle');
     }
+
+    public function ordreFabrication()
+    {
+        return $this->belongsTo(OrdreFabrication::class, 'id_of');
+    }
 }

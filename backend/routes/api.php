@@ -14,6 +14,19 @@ use App\Http\Controllers\Api\OrdreFabricationController;
 use App\Http\Controllers\Api\TypeBijouController;
 use App\Http\Controllers\Api\StatutProductionController;
 
+use App\Http\Controllers\Api\ControleQualiteController;
+use App\Http\Controllers\Api\StatistiquesController;
+use App\Http\Controllers\Api\TypeDefautController;
+
+Route::get('types-defaut', [TypeDefautController::class, 'index']);
+
+Route::apiResource('controles-qualite', ControleQualiteController::class)
+    ->only(['index', 'store']);
+
+Route::get('statistiques/taux-rejet', [StatistiquesController::class, 'tauxRejetParBijou']);
+Route::get('statistiques/defauts-par-type', [StatistiquesController::class, 'defautsParType']);
+Route::get('dashboard/kpi', [StatistiquesController::class, 'kpiDashboard']);
+
 Route::get('types-bijou', [TypeBijouController::class, 'index']);
 Route::get('statuts-production', [StatutProductionController::class, 'index']);
 

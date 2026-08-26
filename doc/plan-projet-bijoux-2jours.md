@@ -340,17 +340,17 @@ npx tailwindcss init -p
 ### Après-midi (env. 4h) — Fonctionnalité 3 (Qualité + Stats) + finitions
 
 **Backend :**
-- [ ] Migration triggers/vues Fonctionnalité 3 (`fn_incrementer_rejet`, `vue_taux_rejet_par_bijou`, `vue_kpi_dashboard`)
-- [ ] `ControleQualiteController` (store avec défauts associés, transaction)
-- [ ] `StatistiquesController` (expose les vues)
-- [ ] Route `GET /api/dashboard/kpi`
-- [ ] Tests PHPUnit restants
+- [x] Migration triggers/vues Fonctionnalité 3 (`fn_incrementer_rejet`, `vue_taux_rejet_par_bijou`, `vue_kpi_dashboard`)
+- [x] `ControleQualiteController` (store avec défauts associés, transaction)
+- [x] `StatistiquesController` (expose les vues)
+- [x] Route `GET /api/dashboard/kpi`
+- [x] Tests PHPUnit restants
 
 **Frontend :**
-- [ ] Page *Contrôle qualité* (checklist défauts + décision)
-- [ ] Onglet *Statistiques* (graphiques Recharts : taux de rejet, défauts par type)
-- [ ] Finaliser le Dashboard avec les vraies données KPI (`vue_kpi_dashboard`)
-- [ ] Passe de cohérence visuelle (couleurs, espacements, responsive basique)
+- [x] Page *Contrôle qualité* (checklist défauts + décision)
+- [x] Onglet *Statistiques* (graphiques Recharts : taux de rejet, défauts par type)
+- [x] Finaliser le Dashboard avec les vraies données KPI (`vue_kpi_dashboard`)
+- [x] Passe de cohérence visuelle (couleurs, espacements, responsive basique)
 
 **Finitions (dernière heure) :**
 - [ ] Relire et compléter le `README.md` (stack, install, captures d'écran, roadmap des fonctionnalités non traitées)

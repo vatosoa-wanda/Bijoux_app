@@ -11,4 +11,9 @@ class DefautConstate extends Model
     public $timestamps = false;
 
     protected $fillable = ['id_controle', 'id_type_defaut', 'quantite', 'photo_url', 'commentaire'];
+
+    public function typeDefaut()
+    {
+        return $this->belongsTo(TypeDefaut::class, 'id_type_defaut');
+    }
 }

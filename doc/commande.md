@@ -138,3 +138,24 @@ php artisan test --filter=OrdreFabricationTest
 
 php artisan make:controller Api/TypeBijouController
 php artisan make:controller Api/StatutProductionController
+
+
+# Fonctionnalite 3
+
+# Migration triggers/vues — Fonctionnalité 3
+php artisan make:migration create_qualite_functions_and_views
+
+php artisan make:controller Api/TypeDefautController
+
+php artisan make:request StoreControleQualiteRequest
+
+php artisan make:resource ControleQualiteResource
+php artisan make:resource DefautConstateResource
+
+php artisan make:controller Api/ControleQualiteController
+php artisan make:controller Api/StatistiquesController
+
+# Test
+php artisan make:test ControleQualiteTest
+
+php artisan test --filter=ControleQualiteTest
