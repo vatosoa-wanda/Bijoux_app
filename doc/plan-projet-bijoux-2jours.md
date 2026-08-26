@@ -310,13 +310,13 @@ npx tailwindcss init -p
 
 ### Après-midi (env. 4h) — Frontend layout + Fonctionnalité 1
 
-- [ ] Layout général React : `Sidebar` + `Header` en reprenant le Design System (couleurs, Poppins, structure de `dashboard.html` fourni)
-- [ ] Mise en place React Router (routes des 6 pages retenues)
-- [ ] Client API (axios instance avec base URL + intercepteur d'erreurs)
-- [ ] Page *Matières premières* (tableau + modal ajout/édition)
-- [ ] Page *Stock & mouvements* (historique + formulaire entrée/sortie + badges Alerte/OK)
-- [ ] Widget alertes sur le Dashboard (données réelles via `/api/matieres/alertes`)
-- [ ] Commit + push
+- [x] Layout général React : `Sidebar` + `Header` en reprenant le Design System (couleurs, Poppins, structure de `dashboard.html` fourni)
+- [x] Mise en place React Router (routes des 6 pages retenues)
+- [x] Client API (axios instance avec base URL + intercepteur d'erreurs)
+- [x] Page *Matières premières* (tableau + modal ajout/édition)
+- [x] Page *Stock & mouvements* (historique + formulaire entrée/sortie + badges Alerte/OK)
+- [x] Widget alertes sur le Dashboard (données réelles via `/api/matieres/alertes`)
+- [x] Commit + push
 
 ---
 
@@ -325,12 +325,12 @@ npx tailwindcss init -p
 ### Matin (env. 4h) — Fonctionnalité 2 (Production + coût de revient)
 
 **Backend :**
-- [ ] Migrations restantes : `type_defaut`, `statut_production`, `ordre_fabrication`, `consommation_of`, `produit_fini`, `controle_qualite`, `defaut_constate`
-- [ ] Migration triggers/fonctions Fonctionnalité 2 (`fn_cout_revient`, `fn_cloturer_of`)
-- [ ] `BijouController` + `CompositionBijouController`
-- [ ] `OrdreFabricationController` (création avec vérification de disponibilité, changement de statut)
-- [ ] Route `GET /api/bijoux/{id}/cout-revient`
-- [ ] Tests Postman + 2-3 tests PHPUnit (clôture OF → stock décrémenté, calcul coût de revient)
+- [x] Migrations restantes : `type_defaut`, `statut_production`, `ordre_fabrication`, `consommation_of`, `produit_fini`, `controle_qualite`, `defaut_constate`
+- [x] Migration triggers/fonctions Fonctionnalité 2 (`fn_cout_revient`, `fn_cloturer_of`)
+- [x] `BijouController` + `CompositionBijouController`
+- [x] `OrdreFabricationController` (création avec vérification de disponibilité, changement de statut)
+- [x] Route `GET /api/bijoux/{id}/cout-revient`
+- [x] Tests Postman + 2-3 tests PHPUnit (clôture OF → stock décrémenté, calcul coût de revient)
 
 **Frontend :**
 - [ ] Page *Fiches bijoux* : formulaire + éditeur de nomenclature (ajout de lignes matière/quantité)

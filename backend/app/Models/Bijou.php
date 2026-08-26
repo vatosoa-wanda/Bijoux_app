@@ -31,4 +31,9 @@ class Bijou extends Model
     {
         return $this->hasMany(CompositionBijou::class, 'id_bijou');
     }
+
+    public function ordresFabrication()
+    {
+        return $this->hasMany(OrdreFabrication::class, 'id_bijou');
+    }
 }

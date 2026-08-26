@@ -14,6 +14,11 @@ class DatabaseSeeder extends Seeder
             TypeMouvementSeeder::class,
             ParametreSeeder::class,
             MatierePremiereSeeder::class,
+            TypeBijouSeeder::class,
+            StatutProductionSeeder::class,
+            TypeDefautSeeder::class,
+            BijouSeeder::class,
+            CompositionBijouSeeder::class,
         ]);
     }
 }

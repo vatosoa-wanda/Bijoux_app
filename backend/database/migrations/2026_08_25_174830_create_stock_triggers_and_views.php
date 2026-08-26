@@ -39,7 +39,7 @@ return new class extends Migration
         SQL);
 
         DB::unprepared(<<<'SQL'
-            CREATE VIEW vue_stock_alertes AS
+            CREATE OR REPLACE VIEW vue_stock_alertes AS
             SELECT id_matiere, nom, quantite_stock, seuil_alerte
             FROM matiere_premiere
             WHERE quantite_stock <= seuil_alerte AND actif = TRUE;
