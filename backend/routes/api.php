@@ -11,6 +11,13 @@ use App\Http\Controllers\Api\BijouController;
 use App\Http\Controllers\Api\CompositionBijouController;
 use App\Http\Controllers\Api\OrdreFabricationController;
 
+use App\Http\Controllers\Api\TypeBijouController;
+use App\Http\Controllers\Api\StatutProductionController;
+
+Route::get('types-bijou', [TypeBijouController::class, 'index']);
+Route::get('statuts-production', [StatutProductionController::class, 'index']);
+
+// J2
 Route::get('bijoux/{bijou}/cout-revient', [BijouController::class, 'coutRevient']);
 
 Route::apiResource('bijoux', BijouController::class);

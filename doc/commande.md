@@ -134,3 +134,7 @@ php artisan test --filter=OrdreFabricationTest
 ✓ cloture of decremente le stock et cree le produit fini
 ✓ le cout de revient est calcule correctement
 ✓ cloture of refusee si stock devenu insuffisant -->
+
+
+php artisan make:controller Api/TypeBijouController
+php artisan make:controller Api/StatutProductionController

@@ -333,9 +333,9 @@ npx tailwindcss init -p
 - [x] Tests Postman + 2-3 tests PHPUnit (clôture OF → stock décrémenté, calcul coût de revient)
 
 **Frontend :**
-- [ ] Page *Fiches bijoux* : formulaire + éditeur de nomenclature (ajout de lignes matière/quantité)
-- [ ] Page *Production* : liste des OF, création, workflow de statut simplifié (3 statuts), affichage coût de revient calculé
-- [ ] Commit + push
+- [x] Page *Fiches bijoux* : formulaire + éditeur de nomenclature (ajout de lignes matière/quantité)
+- [x] Page *Production* : liste des OF, création, workflow de statut simplifié (3 statuts), affichage coût de revient calculé
+- [x] Commit + push
 
 ### Après-midi (env. 4h) — Fonctionnalité 3 (Qualité + Stats) + finitions
 

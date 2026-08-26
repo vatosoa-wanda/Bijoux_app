@@ -15,6 +15,7 @@ export default function StockMouvements() {
   useEffect(() => {
     loadMouvements();
     apiClient.get('/matieres').then((res) => setMatieres(res.data.data));
+    apiClient.get('/types-mouvement').then((res) => setTypes(res.data.data));
     // Types de mouvement : réutilise la table via un futur endpoint dédié si besoin.
     // Pour l'instant on peut aussi les coder en dur si pas d'endpoint créé.
   }, []);
@@ -80,6 +81,7 @@ export default function StockMouvements() {
             onChange={(e) => setForm({ ...form, id_type_mvt: e.target.value })}
           >
             <option value="">Type de mouvement</option>
+            {types.map((t) => <option key={t.id_type_mvt} value={t.id_type_mvt}>{t.libelle}</option>)}
             {/* à remplacer par un fetch réel une fois l'endpoint type-mouvement créé */}
           </select>
 
