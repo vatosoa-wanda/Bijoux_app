@@ -363,8 +363,8 @@ npx tailwindcss init -p
 
 ## 5. CHECKLIST FINALE — CE QUE VOUS DEVEZ POUVOIR MONTRER
 
-- [ ] Un dépôt Git propre avec historique de commits progressif
-- [ ] Un README complet avec captures d'écran
-- [ ] Les 3 fonctionnalités phares fonctionnelles de bout en bout (DB → API → UI)
-- [ ] Au moins 6-8 tests PHPUnit passants
+- [x] Un dépôt Git propre avec historique de commits progressif
+- [x] Un README complet avec captures d'écran
+- [x] Les 3 fonctionnalités phares fonctionnelles de bout en bout (DB → API → UI)
+- [x] Au moins 6-8 tests PHPUnit passants
 - [ ] Une explication claire, prête pour l'entretien, de **pourquoi** la logique a été mise en base (triggers/fonctions/vues) plutôt qu'en PHP — c'est le point différenciant de ce projet.

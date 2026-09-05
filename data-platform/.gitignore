@@ -1,0 +1,6 @@
+# Clés de comptes de service GCP
+*.json
+bijoux-etl-key.json
+todo.md
+.env
+venv-etl/
