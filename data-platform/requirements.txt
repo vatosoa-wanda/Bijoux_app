@@ -9,6 +9,7 @@ google-cloud-core==2.7.0
 google-crc32c==1.8.0
 google-resumable-media==2.10.2
 googleapis-common-protos==1.75.3
+greenlet==3.5.5
 grpcio==1.83.1
 grpcio-status==1.83.1
 idna==3.19
@@ -19,6 +20,7 @@ pandas==3.0.5
 proto-plus==1.28.4
 protobuf==7.36.1
 psycopg2-binary==2.9.12
+pyarrow==25.0.1
 pyasn1==0.6.4
 pyasn1_modules==0.4.2
 pycparser==3.0
@@ -26,6 +28,7 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.2.3
 requests==2.34.2
 six==1.17.0
+SQLAlchemy==2.0.52
 typing_extensions==4.16.0
 tzdata==2026.3
 urllib3==2.7.0
