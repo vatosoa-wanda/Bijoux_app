@@ -4,3 +4,5 @@ bijoux-etl-key.json
 todo.md
 .env
 venv-etl/
+Readme_data.md
+__pycache__
