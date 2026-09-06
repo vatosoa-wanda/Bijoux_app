@@ -232,8 +232,18 @@ def load_table(client: bigquery.Client, dataset_id: str, spec: LoadSpec) -> int:
         )
 
     df = pd.read_parquet(staging_path)
+    table_id = f"{dataset_id}.{spec.bq_table}"
+
     if df.empty:
-        logger.warning("  -> %s : fichier vide, table non modifiée", spec.bq_table)
+        # Une table vide doit quand même EXISTER avec le bon schéma : sinon,
+        # une requête d'agrégation qui la référence (même en LEFT JOIN)
+        # échouera avec "table not found", ce qui n'a rien à voir avec le
+        # LEFT JOIN lui-même (celui-ci gère l'absence de LIGNES, pas
+        # l'absence de la TABLE).
+        client.create_table(bigquery.Table(table_id, schema=spec.schema), exists_ok=True)
+        logger.warning(
+            "  -> %s : source vide, table (re)créée sans données", spec.bq_table
+        )
         return 0
 
     df = _cast_numeric_columns(df, spec.schema)

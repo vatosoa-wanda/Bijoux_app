@@ -159,3 +159,19 @@ php artisan make:controller Api/StatistiquesController
 php artisan make:test ControleQualiteTest
 
 php artisan test --filter=ControleQualiteTest
+
+
+
+
+## Commande partie data-platform (google cloud)
+
+gcloud auth login
+gcloud config set project bijoux-data-platform
+
+
+venv-etl\Scripts\activate
+
+gcloud config get-value project
+
+# supprimer dataset existant 
+bq rm -r -f -d bijoux-data-platform:analytics_bijoux
