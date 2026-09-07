@@ -1,8 +1,17 @@
 # Data Platform — Bijoux App
 
-Module d'analytique ajouté à l'application de gestion de bijoux artisanaux. Il complète l'application transactionnelle existante (Laravel + React + PostgreSQL) par une couche **data engineering** : extraction, chargement dans un entrepôt cloud (BigQuery), agrégation en indicateurs métier, et orchestration automatisée.
+Module d'analytique ajouté à l'application de gestion de bijoux artisanaux. Il complète l'application transactionnelle existante (Laravel + React + PostgreSQL) par une couche **data engineering** : extraction, chargement dans un entrepôt cloud (BigQuery), et agrégation en indicateurs métier.
 
 > Ce README s'adresse à toute personne qui reprend ce module sans contexte préalable : il doit permettre de comprendre l'architecture, relancer le pipeline, et savoir où chercher en cas de problème.
+
+Le projet est réparti en **deux dossiers** à la racine du dépôt :
+```
+Bijoux_app/
+├── data-platform/     # le code du pipeline (ce README)
+└── airflow/           # l'orchestrateur qui exécute ce code selon un planning
+                        # → voir airflow/README.md pour tout ce qui concerne Airflow/Docker
+```
+`data-platform/` peut être exécuté seul, à la main, sans Airflow — c'est ce que documente ce fichier. Pour l'automatisation planifiée (DAG, Docker, dépannage Airflow), voir [`airflow/README.md`](../airflow/README.md).
 
 ---
 
@@ -25,7 +34,7 @@ PostgreSQL (transactionnel)  →  BigQuery (analytique)  →  BI / dashboard
 │   Application existante      │
 │  React → Laravel → PostgreSQL│
 └───────────────┬───────────────┘
-                │  extraction quotidienne (batch)
+                │  extraction (batch)
                 ▼
         ┌───────────────┐
         │  extract.py    │  PostgreSQL → staging/*.parquet
@@ -39,16 +48,12 @@ PostgreSQL (transactionnel)  →  BigQuery (analytique)  →  BI / dashboard
         │ transform.py   │  raw_* → tables de faits + vue_dashboard
         └───────┬───────┘
                 ▼
-        ┌───────────────┐
-        │ pipeline.py    │  orchestre les 3 étapes, s'arrête au 1er échec
-        └───────┬───────┘
-                ▼
-     Planificateur (cron / Planificateur de tâches Windows)
-                ▼
         BI (Looker Studio, Metabase...) ← lit vue_dashboard
 ```
 
-**Principe clé : ELT, pas ETL.** On charge les données brutes dans BigQuery (`load.py`) *avant* de les transformer (`transform.py`), plutôt que de les transformer avant de les charger. BigQuery est très rapide en SQL sur de gros volumes, donc c'est plus simple et plus robuste de lui laisser faire les agrégations.
+`extract.py`, `load.py`, `transform.py` sont des scripts Python **autonomes**, testables et exécutables seuls (section 7). Ils sont enchaînés soit manuellement via `pipeline.py`, soit automatiquement par Airflow (voir `airflow/README.md`) — dans les deux cas, c'est exactement le même code qui tourne.
+
+**Principe clé : ELT, pas ETL.** On charge les données brutes dans BigQuery (`load.py`) *avant* de les transformer (`transform.py`), plutôt que l'inverse. BigQuery est très rapide en SQL sur de gros volumes, donc c'est plus simple et plus robuste de lui laisser faire les agrégations.
 
 ---
 
@@ -62,7 +67,7 @@ PostgreSQL (transactionnel)  →  BigQuery (analytique)  →  BI / dashboard
 | Entrepôt de données | BigQuery (Google Cloud) | 1 To de requêtes + 10 Go de stockage gratuits par mois, gestion serverless |
 | Chargement | `google-cloud-bigquery` (SDK officiel) | direct, pas de connecteur tiers payant |
 | Format d'échange | Parquet (zone `staging/`) | plus compact qu'un CSV, types préservés (dates, décimaux) |
-| Orchestration | script Python séquentiel + planificateur système (cron / Planificateur de tâches) | suffisant pour un batch quotidien ; **Apache Airflow** serait l'étape suivante en production (voir roadmap) |
+| Orchestration | **Apache Airflow** (Docker) | détails complets dans `airflow/README.md` |
 
 ---
 
@@ -72,11 +77,13 @@ PostgreSQL (transactionnel)  →  BigQuery (analytique)  →  BI / dashboard
 - PostgreSQL déjà rempli avec le schéma de l'application (`base_de_donnees.sql`)
 - Un compte Google Cloud avec facturation activée (le free tier suffit très largement)
 - Google Cloud CLI installé (`gcloud`, `bq`)
+- Docker Desktop **uniquement si vous voulez utiliser Airflow** — voir `airflow/README.md`
 
 ---
 
 ## 5. Installation
 
+### 5.1 Environnement Python
 ```bash
 cd data-platform
 python3 -m venv venv-etl
@@ -84,8 +91,7 @@ source venv-etl/bin/activate        # Windows : venv-etl\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Configuration Google Cloud (à faire une seule fois)
-
+### 5.2 Configuration Google Cloud (à faire une seule fois)
 ```bash
 gcloud auth login
 gcloud config set project <votre-projet-id>
@@ -105,13 +111,12 @@ gcloud projects add-iam-policy-binding <votre-projet-id> \
 gcloud iam service-accounts keys create bijoux-etl-key.json \
   --iam-account=bijoux-etl@<votre-projet-id>.iam.gserviceaccount.com
 ```
-
 ⚠️ `bijoux-etl-key.json` et `.env` contiennent des secrets : ils sont dans `.gitignore`, ne jamais les commit.
 
-### Fichier `.env`
+> Cette même clé (`bijoux-etl-key.json`) devra être copiée dans `airflow/dags/` si vous utilisez Airflow — voir `airflow/README.md`.
 
+### 5.3 Fichier `.env`
 Copier `.env.example` vers `.env` et remplir :
-
 ```env
 PGHOST=localhost
 PGPORT=5432
@@ -138,24 +143,31 @@ data-platform/
 ├── load.py                   # Étape 2 : staging/ → BigQuery (tables raw_*)
 ├── transform.sql             # Requêtes d'agrégation (lues par transform.py)
 ├── transform.py              # Étape 3 : exécute transform.sql dans BigQuery
-├── pipeline.py                # Orchestration des 3 étapes
-├── run_pipeline.bat           # Lanceur pour le Planificateur de tâches Windows
+├── pipeline.py                # Orchestration manuelle des 3 étapes (hors Airflow)
+├── run_pipeline.bat           # Lanceur pour un test rapide / ancien Planificateur Windows
 ├── staging/                   # fichiers .parquet intermédiaires (généré, non commité)
 ├── logs/                      # logs d'exécution (généré, non commité)
 └── tests/
     └── test_pipeline.py
 ```
 
+> ⚠️ `extract.py`, `load.py`, `transform.py`, `transform.sql` existent aussi en copie dans `airflow/dags/`, pour qu'Airflow puisse les exécuter (Docker ne voit pas ce dossier par défaut). **Toute modification de la logique du pipeline doit être répercutée dans les deux dossiers.** Limite connue, voir section 12 et la roadmap de `airflow/README.md`.
+
 ---
 
 ## 7. Comment lancer
 
-### Tout le pipeline d'un coup (usage normal)
+### Usage recommandé : via Airflow (planification automatique quotidienne)
+Voir `airflow/README.md` — interface web sur [http://localhost:8080](http://localhost:8080).
+
+### Usage manuel (développement, debug rapide, test d'une seule étape)
+
+Tout le pipeline d'un coup :
 ```bash
 python pipeline.py
 ```
 
-### Étape par étape (pour déboguer)
+Étape par étape :
 ```bash
 python extract.py                                   # toutes les tables
 python extract.py --tables mouvement_stock          # une seule table
@@ -167,9 +179,9 @@ python transform.py                                  # toutes les agrégations, 
 python transform.py --queries fact_stock_mensuel      # une seule requête
 ```
 
-### Planification automatique
+### Planification sans Airflow (alternative simple, si Docker n'est pas disponible)
 - **Windows** : `schtasks /create /tn "BijouxDataPipeline" /tr "...\run_pipeline.bat" /sc daily /st 02:00`
-- **Linux / macOS** : entrée cron `0 2 * * * /chemin/venv-etl/bin/python /chemin/pipeline.py >> /chemin/logs/pipeline.log 2>&1`
+- **Linux / macOS** : cron `0 2 * * * /chemin/venv-etl/bin/python /chemin/pipeline.py >> /chemin/logs/pipeline.log 2>&1`
 
 Détail des flags : voir section 9.
 
@@ -194,11 +206,11 @@ Détail des flags : voir section 9.
 
 | Table / Vue | Type | Colonnes | Grain | Calculée à partir de | Fréquence |
 |---|---|---|---|---|---|
-| `fact_stock_mensuel` | TABLE | `mois`, `id_matiere`, `total_entrees`, `total_sorties` | un mois × une matière | `raw_mouvement_stock` | recalculée à chaque run du pipeline |
+| `fact_stock_mensuel` | TABLE | `mois`, `id_matiere`, `total_entrees`, `total_sorties` | un mois × une matière | `raw_mouvement_stock` | recalculée à chaque run |
 | `fact_qualite_mensuelle` | TABLE | `mois`, `id_bijou`, `total_controle`, `total_rejete`, `taux_rejet_pct` | un mois × un bijou | `raw_controle_qualite` (dédupliqué) + `raw_ordre_fabrication` | idem |
 | `fact_defauts_mensuels` | TABLE | `mois`, `defaut_code`, `defaut_libelle`, `total_defauts` | un mois × un type de défaut | `raw_controle_qualite` (grain défaut, non dédupliqué) | idem |
 | `fact_rentabilite_collection` | TABLE | `mois`, `id_collection`, `collection_nom`, `cout_moyen`, `prix_vente_moyen`, `marge_moyenne`, `marge_pct` | un mois × une collection | `raw_produit_fini` + `raw_bijou` + `raw_collection` | idem |
-| `vue_dashboard` | **VIEW** | `mois` + indicateurs clés des 3 tables de faits | un mois | les 4 tables `fact_*` | **pas de fréquence propre** : recalculée à chaque lecture, donc toujours cohérente avec les `fact_*` déjà chargées |
+| `vue_dashboard` | **VIEW** | `mois` + indicateurs clés des 3 tables de faits | un mois | les 4 tables `fact_*` | **pas de fréquence propre** : recalculée à chaque lecture |
 
 C'est la table/vue `vue_dashboard` que tout outil de BI (Looker Studio, Metabase...) doit lire en priorité.
 
@@ -216,44 +228,69 @@ pip freeze > requirements.txt         # regénérer la liste après un nouvel in
 
 ### Google Cloud CLI (`gcloud`)
 ```bash
-gcloud auth login                          # se connecter à son compte Google
-gcloud config set project <id>             # définir le projet actif par défaut
-gcloud config get-value project            # vérifier le projet actif
-gcloud services enable bigquery.googleapis.com   # activer l'API BigQuery
+gcloud auth login
+gcloud config set project <id>
+gcloud config get-value project
+gcloud services enable bigquery.googleapis.com
 ```
 
 ### BigQuery CLI (`bq`)
 ```bash
-bq ls                                              # lister les datasets du projet
-bq ls analytics_bijoux                             # lister les tables d'un dataset
-bq show analytics_bijoux.raw_mouvement_stock       # voir le schéma d'une table
+bq ls
+bq ls analytics_bijoux
+bq show analytics_bijoux.raw_mouvement_stock
 bq query --use_legacy_sql=false "SELECT * FROM analytics_bijoux.vue_dashboard"
-bq rm -r -f -d <projet>:analytics_bijoux           # supprimer tout le dataset (repart de zéro)
+bq rm -r -f -d <projet>:analytics_bijoux
 ```
 
 ### Planification (Windows `schtasks`)
 ```cmd
 schtasks /create /tn "BijouxDataPipeline" /tr "...\run_pipeline.bat" /sc daily /st 02:00
-schtasks /run /tn "BijouxDataPipeline"              REM lancer immédiatement, sans attendre
+schtasks /run /tn "BijouxDataPipeline"              REM lancer immédiatement
 schtasks /query /tn "BijouxDataPipeline" /v /fo LIST REM voir le dernier résultat (0 = succès)
-schtasks /change /tn "BijouxDataPipeline" /st 03:30 REM changer l'heure
 schtasks /delete /tn "BijouxDataPipeline" /f        REM supprimer la tâche
 ```
 
-### Planification (Linux/macOS `cron`)
-```bash
-crontab -e                                # éditer la liste des tâches planifiées
-# ajouter la ligne :
-0 2 * * * /chemin/venv-etl/bin/python /chemin/pipeline.py >> /chemin/logs/pipeline.log 2>&1
-crontab -l                                # vérifier les tâches actives
-```
+> Commandes Docker/Airflow (`docker compose`, `airflow-cli`...) : voir `airflow/README.md`.
 
+---
 
-## Roadmap v2 (ce qui serait fait "en vrai" en production)
+## 10. Vocabulaire à connaître (glossaire rapide)
 
-- **Apache Airflow** (ou Google Cloud Composer) à la place du script + cron : DAG avec retries automatiques, alerting, historique visuel des exécutions
+| Terme | Définition courte |
+|---|---|
+| **OLTP** | base optimisée pour des transactions unitaires (PostgreSQL ici) |
+| **OLAP** | base optimisée pour l'analyse de gros volumes (BigQuery ici) |
+| **ELT** | Extract → Load (brut) → Transform *dans* l'entrepôt (approche retenue ici) |
+| **Idempotence** | relancer le pipeline plusieurs fois de suite donne le même résultat (`WRITE_TRUNCATE`) |
+| **Grain** | ce que représente une ligne d'une table — se tromper de grain fausse silencieusement les agrégations |
+| **Fan-out** | multiplication du nombre de lignes causée par une jointure 1-vers-N |
+| **Dataset (BigQuery)** | conteneur logique qui regroupe des tables liées |
+| **Batch** | traitement par lots à intervalle régulier, par opposition au streaming temps réel |
+
+> Glossaire Airflow (DAG, Task, Scheduler, Executor, Catchup...) : voir `airflow/README.md`.
+
+---
+
+> Problèmes spécifiques à Airflow/Docker : voir `airflow/README.md`.
+
+---
+
+## 12. Limites connues (assumées pour un projet portfolio)
+
+- Extraction **batch quotidienne**, pas de temps réel — non nécessaire pour ce cas d'usage
+- Pas d'ingestion incrémentale (CDC) : chaque run réextrait tout, acceptable au volume actuel
+- Pas de tests de qualité de données automatisés (ex : Great Expectations) — validation manuelle actuellement
+- Code du pipeline dupliqué entre `data-platform/` et `airflow/dags/` (voir section 6)
+
+---
+
+## Roadmap v2
+
 - **CDC (Change Data Capture)** via Debezium pour ne synchroniser que les lignes modifiées, au lieu de tout réextraire
 - **dbt** pour versionner les transformations SQL de `transform.sql` : tests de données intégrés, documentation auto-générée, lineage visuel
 - **Tests de qualité automatisés** (Great Expectations ou équivalent) : ex. vérifier que `taux_rejet_pct` reste entre 0 et 100
 - **BI branché en continu** : Looker Studio connecté directement à `vue_dashboard` pour un dashboard public consultable par toute l'équipe
 - **Gouvernance** : data catalog, contrôle d'accès par rôle sur le dataset
+
+> Roadmap orchestration/infra (secrets, alerting, dossier de code partagé...) : voir `airflow/README.md`.

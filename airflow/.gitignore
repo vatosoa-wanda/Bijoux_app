@@ -1,0 +1,23 @@
+# --- Secrets : ne jamais committer ---
+.env
+dags/bijoux-etl-key.json
+
+# --- Généré automatiquement par Airflow à l'exécution ---
+# Logs de chaque tâche/run : volumineux, régénérés à chaque exécution
+logs/
+# Config par défaut créée par airflow-init, spécifique à la machine
+config/
+
+# --- Cache Python ---
+__pycache__/
+*.pyc
+
+# --- Données intermédiaires générées par extract.py (comme data-platform/staging/) ---
+dags/staging/
+
+# --- Plugins Airflow personnalisés (vide dans ce projet, à retirer si vous en ajoutez un jour) ---
+plugins/*
+!plugins/.gitkeep
+
+
+todo.md
